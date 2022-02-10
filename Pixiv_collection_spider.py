@@ -10,20 +10,21 @@ Path(path).mkdir(parents = True, exist_ok = True)
 
 # ===需要设置的参数===
 page = 1 # 获取到第几页为止
+users_id = 12345678 # 设置好你的个人收藏页面url里的ID，示例：https://www.pixiv.net/users/12345678/bookmarks/artworks ，users后跟的就是你的ID
+
 
 url_pages = []
 for r in range(page):
     offset = r * 48
-    url_page = f'https://www.pixiv.net/ajax/user/15103058/illusts/bookmarks?tag=&offset={offset}&limit=48&rest=show&lang=zh' # 个人收藏的请求地址，一页48个pid（需要抓包获得地址，非浏览器上直接显示的地址）
+    url_page = f'https://www.pixiv.net/ajax/user/{users_id}/illusts/bookmarks?tag=&offset={offset}&limit=48&rest=show&lang=zh'
     url_pages.append(url_page)
-# ===需要设置的参数===
 
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36 Edg/98.0.1108.43',
     'cookie': ''
 }
-# 请求失败需重新更换cookie，cookie为个人收藏请求地址bookmarks?下的cookie，不能是别处请求到的cookie
+# 添加你的cookie。请求失败需重新更换cookie，cookie为个人收藏请求地址bookmarks?下的cookie，不能是别处请求到的cookie
 
 proxy = {
     'http': 'http://localhost:7890',
