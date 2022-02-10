@@ -14,7 +14,7 @@ page = 1 # 获取到第几页为止
 url_pages = []
 for r in range(page):
     offset = r * 48
-    url_page = f'https://www.pixiv.net/ajax/user/15103058/illusts/bookmarks?tag=&offset={offset}&limit=48&rest=show&lang=zh' # 个人收藏的请求地址（需要抓包获得地址，非浏览器上直接显示的地址）
+    url_page = f'https://www.pixiv.net/ajax/user/15103058/illusts/bookmarks?tag=&offset={offset}&limit=48&rest=show&lang=zh' # 个人收藏的请求地址，一页48个pid（需要抓包获得地址，非浏览器上直接显示的地址）
     url_pages.append(url_page)
 # ===需要设置的参数===
 
@@ -35,7 +35,7 @@ def get_urls():
     global get_urls_msg
     start_time = time.time()
 
-    urls = []
+    urls = {}
     page_num = 0 
     img_url_num = 0
     error_num = 0
@@ -62,9 +62,12 @@ def get_urls():
                     print(f'图片地址爬取失败{error_num}个，ID = {img_id}')
                     continue # 从此结束后继续循环
                 for o in data_id['body']:
+                    bmk_id = i['bookmarkData']['id']
                     img_url = o['urls']['original']
+                    img_name = img_url.split("/")[-1] # 拿到url中的最后一个/以后的内容(图片名)
+                    name = f'{bmk_id}_{img_name}'
                     img_url_num += 1
-                    urls.append(img_url)
+                    urls[name] = img_url
                     print(f'图片地址爬取成功{img_url_num}个')
         except TypeError:
             print('图片数据获取失败，请设置或更换一个cookie！')
@@ -87,26 +90,21 @@ def download():
     img_url_num = 0
     success_num = 0
     error_num = 0
-    for img_url in urls:
-        time_str = time.strftime('%Y-%m-%d')
+    for name, img_url in urls.items():
         img_url_num += 1
-        img_number = str(img_url_num).zfill(6) # 在字符串的开头填充指定数量的 0 值
-        img_type = img_url.split(".")[-1] # 拿到url中的最后一个/以后的内容(图片扩展名)
-        img_name = f'{time_str} {img_number}.{img_type}'
-
-        if not Path(path, img_name).exists(): 
+        if not Path(path, name).exists(): 
             try:
                 img_resp = requests.get(img_url, headers = headers, proxies = proxy, timeout = 30)
             except:
                 error_num += 1
-                print(f'第{img_url_num}个图片下载失败：{img_name}')
+                print(f'第{img_url_num}个图片下载失败：{name}')
                 continue # 从此结束后继续循环
             
-            Path(path, img_name).write_bytes(img_resp.content)
+            Path(path, name).write_bytes(img_resp.content)
             success_num += 1
-            print(f'第{img_url_num}个图片下载成功：{img_name}')
+            print(f'第{img_url_num}个图片下载成功：{name}')
         else:
-            print(f'文件 {img_name} 已存在，不再进行下载')
+            print(f'第{img_url_num}个图片 {name} 已存在，不再进行下载')
 
     end_time = time.time()
     use_time = int(end_time - start_time)

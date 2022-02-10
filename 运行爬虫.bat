@@ -1,2 +1,1 @@
-@echo off
-start cmd /K py Pixiv_collection_spider.py
+start cmd /k py Pixiv_collection_spider.py
