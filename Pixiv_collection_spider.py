@@ -48,7 +48,7 @@ def get_urls():
             print(f'第{page_num}页访问超时，请检查链接地址是否正确，或开启代理！')
             continue
         headers['referer'] = 'https://www.pixiv.net/' # 在请求头中增加一个referer,否则访问图片地址会403
-        resp.encodin = 'utf-8'
+        resp.encoding = 'utf-8'
 
         data = resp.json()
 
