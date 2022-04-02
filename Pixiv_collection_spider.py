@@ -43,9 +43,9 @@ def get_urls():
     for url in url_pages:
         page_num += 1
         try:
-            resp = requests.get(url, headers = headers, proxies = proxy, timeout = 30)
-        except:
-            print(f'第{page_num}页访问超时，请检查链接地址是否正确，或开启代理！')
+            resp = requests.get(url, headers = headers, proxies = proxy, timeout = 90)
+        except Exception as er:
+            print(f'{type(er)} 第{page_num}页访问超时，请检查链接地址是否正确，或开启代理！')
             continue
         headers['referer'] = 'https://www.pixiv.net/' # 在请求头中增加一个referer,否则访问图片地址会403
         resp.encoding = 'utf-8'
@@ -57,10 +57,10 @@ def get_urls():
                 img_id = i['id']
                 url_id = f'https://www.pixiv.net/ajax/illust/{img_id}/pages?lang=zh' # 图片json数据请求地址
                 try:
-                    data_id = requests.get(url_id, headers = headers, proxies = proxy, timeout = 30).json()
-                except:
+                    data_id = requests.get(url_id, headers = headers, proxies = proxy, timeout = 90).json()
+                except Exception as e:
                     error_num += 1
-                    print(f'图片地址爬取失败{error_num}个，ID = {img_id}')
+                    print(f'{type(e)} 图片地址爬取失败{error_num}个，ID = {img_id}')
                     continue # 从此结束后继续循环
                 for o in data_id['body']:
                     bmk_id = i['bookmarkData']['id']
@@ -95,10 +95,10 @@ def download():
         img_url_num += 1
         if not Path(path, name).exists(): 
             try:
-                img_resp = requests.get(img_url, headers = headers, proxies = proxy, timeout = 30)
-            except:
+                img_resp = requests.get(img_url, headers = headers, proxies = proxy, timeout = 90)
+            except Exception as e:
                 error_num += 1
-                print(f'第{img_url_num}个图片下载失败：{name}')
+                print(f'{type(e)} 第{img_url_num}个图片下载失败：{name}')
                 continue # 从此结束后继续循环
             
             Path(path, name).write_bytes(img_resp.content)
